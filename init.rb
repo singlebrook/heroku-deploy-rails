@@ -1,5 +1,5 @@
-require "fileutils"
-require "deploy/heroku/command/deploy"
-require "deploy/heroku/command/base"
+require 'fileutils'
+require 'deploy/heroku/command/base'
+require 'deploy/heroku/command/deploy'
 
-Heroku::Command.global_option :deploy, "--account ACCOUNT"
+Heroku::Command.global_option :deploy, ''

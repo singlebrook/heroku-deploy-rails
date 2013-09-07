@@ -9,12 +9,8 @@ class Heroku::Command::Deploy < Heroku::Command::Base
   # list all known deployment strategies
   #
   def index
-    deployers = methods(false).except(:index)
-
     display "Available deployment strategies:"
-    deployers.each do |name|
-      display name
-    end
+    display 'heroku deploy:rails'
   end
 
   # deploy:rails
