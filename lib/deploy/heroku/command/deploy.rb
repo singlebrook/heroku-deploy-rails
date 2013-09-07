@@ -1,4 +1,4 @@
-require "heroku/command/base"
+require 'heroku/command/base'
 
 # deploy apps to Heroku
 #
@@ -9,7 +9,7 @@ class Heroku::Command::Deploy < Heroku::Command::Base
   # list all known deployment strategies
   #
   def index
-    display "Available deployment strategies:"
+    display 'Available deployment strategies:'
     display 'heroku deploy:rails'
   end
 
@@ -17,9 +17,16 @@ class Heroku::Command::Deploy < Heroku::Command::Base
   #
   # deploy a Rails app with migrations, etc
   #
+  # -b BRANCH, --branch BRANCH # Specify a branch/tag to deploy. Defaults to master.
+  #
   def rails
+    display "Deploying branch #{branch} to app #{app}"
+  end
 
+  private
 
+  def branch
+    options[:branch] || 'master'
   end
 
 end
