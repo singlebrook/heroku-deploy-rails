@@ -1,5 +1,5 @@
 require 'net/http'
-require 'open3'
+require 'pty'
 
 module Heroku::Deploy
 
@@ -52,15 +52,21 @@ module Heroku::Deploy
       raise(RepoPushError, "Failed to push repository") unless success
     end
 
-    def run_cmd(cmd, output = true)
-      exit_status = Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
-        out = stdout.gets
-        err = stderr.gets
-        puts out.chomp if output && out
-        puts err.chomp if output && err
-        wait_thr.value
+    def run_cmd(cmd, output = false)
+      begin
+        PTY.spawn( cmd ) do |stdin, stdout, pid|
+          begin
+            stdin.each { |line| print line } if output
+          rescue Errno::EIO
+          end
+          Process.wait(pid)
+        end
+        success = ($?.to_i == 0)
+
+      rescue PTY::ChildExited
       end
-      success = (exit_status.to_i == 0)
+
+      return success
     end
 
     def run_migrations
