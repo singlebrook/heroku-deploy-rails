@@ -18,16 +18,25 @@ class Heroku::Command::Deploy < Heroku::Command::Base
   # deploy a Rails app with migrations, etc
   #
   # -b BRANCH, --branch BRANCH # Specify a branch/tag to deploy. Defaults to master.
+  # -f, --force                # Force push repo.
   #
   def rails
-    deployer = Heroku::Deploy::Rails.new(app, branch, git_remote_name)
-    deployer.deploy
+    deployer = Heroku::Deploy::Rails.new(app, branch, git_remote_name, force?)
+    begin
+      deployer.deploy
+    rescue StandardError => e
+      raise Heroku::Command::CommandFailed, e.message
+    end
   end
 
   private
 
   def branch
     options[:branch] || 'master'
+  end
+
+  def force?
+    options[:force] || false
   end
 
   def git_remote_name

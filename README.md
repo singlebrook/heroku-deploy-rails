@@ -4,7 +4,7 @@ Helps deploy apps to Heroku, with migrations, etc.
 
 ## Installation
 
-    $ heroku plugins:install git://github.com/singlebrook/heroku-deploy.git
+    $ heroku plugins:install git://github.com/singlebrook/heroku-deploy-rails.git
 
 ## Usage
 
