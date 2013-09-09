@@ -11,11 +11,13 @@ class Heroku::Command::Deploy < Heroku::Command::Base
   def index
     display 'Available deployment strategies:'
     display 'heroku deploy:rails'
+    # The heroku-deploy plugin offers deployment of .war files.
+    display 'heroku deploy:war' if `heroku plugins`.match(/^heroku-deploy$/)
   end
 
   # deploy:rails
   #
-  # deploy a Rails app with migrations, etc
+  # Deploy a Rails app with migrations, etc
   #
   # -b BRANCH, --branch BRANCH # Specify a branch/tag to deploy. Defaults to master.
   # -f, --force                # Force push repo.

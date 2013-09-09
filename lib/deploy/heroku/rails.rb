@@ -53,6 +53,11 @@ module Heroku::Deploy
     end
 
     def run_cmd(cmd, output = false)
+      # This madness runs system commands with:
+      # 1. Streaming access to stdout, so we can see output from commands as
+      #    they run.
+      # 2. Access to the exit code of the process so we can tell if it succeeded.
+      # It was largely cribbed from http://stackoverflow.com/a/7263243/234158
       begin
         PTY.spawn( cmd ) do |stdin, stdout, pid|
           begin
