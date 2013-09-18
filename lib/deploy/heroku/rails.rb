@@ -14,7 +14,7 @@ module Heroku::Deploy
       raise ArgumentError, 'args must not be empty' if app.empty? || branch.empty? || remote.empty?
 
       force_language = force ? 'with force push' : ''
-      puts "Deploying branch #{branch} to app #{app} at remote #{remote} #{force_language}"
+      status "Deploying branch #{branch} to app #{app} at remote #{remote} #{force_language}"
       @app = app
       @branch = branch
       @remote = remote
@@ -26,7 +26,7 @@ module Heroku::Deploy
       push_changes
       run_migrations if run_migrations_after_push
       visit_site
-      puts 'Deployment complete!'
+      status 'Deployment complete!'
     end
 
     private
@@ -36,23 +36,23 @@ module Heroku::Deploy
     end
 
     def migrations_pending?
-      puts "Checking for pending migrations..."
+      status "Checking for pending migrations..."
       `git fetch #{remote}`
       schema_diff = `git diff #{remote}/master..#{branch} -- db/schema.rb`
       found_migrations_to_run = !schema_diff.empty?
-      puts (found_migrations_to_run ? "found some!" : "found none.")
+      status (found_migrations_to_run ? "found some!" : "found none.")
       found_migrations_to_run
     end
 
     def push_changes
-      puts 'Pushing repo'
-      puts '--------------'
+      status 'Pushing repo'
       success = run_cmd("git push #{force_flag} #{remote} #{branch}:master", true)
-      puts '--------------'
       raise(RepoPushError, "Failed to push repository") unless success
     end
 
     def run_cmd(cmd, output = false)
+      puts "--- #{cmd}" if output
+
       # This madness runs system commands with:
       # 1. Streaming access to stdout, so we can see output from commands as
       #    they run.
@@ -61,7 +61,7 @@ module Heroku::Deploy
       begin
         PTY.spawn( cmd ) do |stdin, stdout, pid|
           begin
-            stdin.each { |line| print line } if output
+            stdin.each { |line| print "| #{line}" } if output
           rescue Errno::EIO
           end
           Process.wait(pid)
@@ -75,16 +75,20 @@ module Heroku::Deploy
     end
 
     def run_migrations
-      puts 'Running migrations'
-      success = run_cmd("heroku maintenance:on --app #{app}")
-      success = success && run_cmd("heroku run rake db:migrate --app #{app}")
-      success = success && run_cmd("heroku restart --app #{app}")
-      success = success && run_cmd("heroku maintenance:off --app #{app}")
+      status 'Running migrations'
+      success = run_cmd("heroku maintenance:on --app #{app}", true)
+      success = success && run_cmd("heroku run rake db:migrate --app #{app}", true)
+      success = success && run_cmd("heroku restart --app #{app}", true)
+      success = success && run_cmd("heroku maintenance:off --app #{app}", true)
       raise MigrationError, 'Failed to run migrations' unless success
     end
 
+    def status(text)
+      puts "*** #{text}"
+    end
+
     def visit_site
-      puts 'Visiting site'
+      status 'Visiting site to spin it up'
       Net::HTTP.get(URI.parse("http://#{app}.herokuapp.com"))
     end
 
