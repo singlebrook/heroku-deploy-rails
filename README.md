@@ -18,6 +18,10 @@ one too many times!
 
     $ heroku plugins:install git://github.com/singlebrook/heroku-deploy-rails.git
 
+## Updating
+
+    $ heroku plugins:update heroku-deploy-rails
+
 ## Usage
 
 To list available deployment strategies:
