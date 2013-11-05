@@ -38,9 +38,14 @@ module Heroku::Deploy
     def migrations_pending?
       status "Checking for pending migrations..."
       `git fetch #{remote}`
-      schema_diff = `git diff #{remote}/master..#{branch} -- db/schema.rb`
-      found_migrations_to_run = !schema_diff.empty?
-      status (found_migrations_to_run ? "found some!" : "found none.")
+      schema_diff = `git diff #{remote}/master..#{branch} -- db/schema.rb 2> /dev/null`
+      if $?.to_i == 0
+        found_migrations_to_run = !schema_diff.empty?
+      else
+        status('No remote master branch was found. Assuming this is the first push for this app.')
+        found_migrations_to_run = true
+      end
+      status(found_migrations_to_run ? "found some!" : "found none.")
       found_migrations_to_run
     end
 
