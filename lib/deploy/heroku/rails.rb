@@ -51,7 +51,9 @@ module Heroku::Deploy
 
     def push_changes
       status 'Pushing repo'
-      success = run_cmd("git push #{force_flag} #{remote} #{branch}:master", true)
+      # We explicitly push to refs/heads/master so that we cannot inadvertantly
+      # create a tag called 'master' if we're pushing a tag.
+      success = run_cmd("git push #{force_flag} #{remote} #{branch}:refs/heads/master", true)
       raise(RepoPushError, "Failed to push repository") unless success
     end
 
