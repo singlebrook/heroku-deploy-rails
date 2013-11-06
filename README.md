@@ -1,4 +1,6 @@
-# Heroku Deploy
+# Heroku Deploy Rails
+
+<img src="https://d3s6mut3hikguw.cloudfront.net/github/singlebrook/heroku-deploy-rails.png">
 
 Helps deploy Rails apps to Heroku, without forgetting important steps.
 
