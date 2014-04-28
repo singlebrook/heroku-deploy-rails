@@ -11,7 +11,9 @@ module Heroku::Deploy
     attr_reader :app, :branch, :remote, :force
 
     def initialize(app, branch, remote, force)
-      raise ArgumentError, 'args must not be empty' if app.empty? || branch.empty? || remote.empty?
+      [:app, :branch, :remote].each do |sym|
+        raise ArgumentError, "#{sym} was not supplied" if eval(sym.to_s).empty?
+      end
 
       force_language = force ? 'with force push' : ''
       status "Deploying branch #{branch} to app #{app} at remote #{remote} #{force_language}"
