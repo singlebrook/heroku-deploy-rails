@@ -13,6 +13,7 @@ class Heroku::Command::Base
         case %x{ git config remote.#{name}.url }
           when /git@#{heroku.host}:([\w\d-]+)\.git/  then remotes[name] = $1
           when /git@heroku.[\w\d-]+:([\w\d-]+)\.git/ then remotes[name] = $1
+          when %r|https://git\.heroku\.com/([\w\d-]+)\.git| then remotes[name] = $1
         end
       end
     end
