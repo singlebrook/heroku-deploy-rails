@@ -40,7 +40,7 @@ module Heroku::Deploy
     def migrations_pending?
       status "Checking for pending migrations..."
       `git fetch #{remote}`
-      schema_diff = `git diff #{remote}/master..#{branch} -- db/schema.rb 2> /dev/null`
+      schema_diff = `git diff #{remote}/master..#{branch} -- db/schema.rb db/structure.sql 2> /dev/null`
       if $?.to_i == 0
         found_migrations_to_run = !schema_diff.empty?
       else
